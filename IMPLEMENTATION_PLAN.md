@@ -36,34 +36,34 @@ Ready for local Docker execution or deployment to a cloud VPS like **Vultr**.
 
 ```mermaid
 flowchart TD
-    GH["GitHub Webhook (PR opened, synchronize)"] -->|POST /webhook/github| API[FastAPI Webhook Handler]
-    API -->|Verify HMAC SHA-256| SEC[Signature Verification]
-    API -->|Background Task| ORCH[Reviewer Orchestrator]
+    GH["GitHub Webhook (PR opened, synchronize)"] -->|"POST /webhook/github"| API["FastAPI Webhook Handler"]
+    API -->|"Verify HMAC SHA-256"| SEC["Signature Verification"]
+    API -->|"Background Task"| ORCH["Reviewer Orchestrator"]
     
     subgraph Token-Efficient Context Gathering
-        ORCH -->|PyGithub| GHS[GitHub Service]
-        GHS -->|1. Fetch Raw PR Diff & Changed Line Ranges| GHR[(GitHub Repo)]
-        GHS -->|2. Extract Lint Configs & Docs| GHR
+        ORCH -->|"PyGithub"| GHS["GitHub Service"]
+        GHS -->|"1. Fetch Raw PR Diff & Changed Line Ranges"| GHR[("GitHub Repo")]
+        GHS -->|"2. Extract Lint Configs & Docs"| GHR
         
-        ORCH --> CTX[Context & Snippet Builder]
-        CTX -->|AST / Scope Detection| CTX
-        CTX -->|Extract Enclosing Function + Nested Helpers| GHS
-        CTX -->|Extract Caller Function Snippets across Repo| GHS
-        CTX --> BUNDLE[Targeted Semantic Snippet Context Bundle]
+        ORCH --> CTX["Context & Snippet Builder"]
+        CTX -->|"AST / Scope Detection"| CTX
+        CTX -->|"Extract Enclosing Function + Nested Helpers"| GHS
+        CTX -->|"Extract Caller Function Snippets across Repo"| GHS
+        CTX --> BUNDLE["Targeted Semantic Snippet Context Bundle"]
     end
 
     subgraph OpenHands Core Intelligence
-        BUNDLE --> OH[OpenHands Model Client]
-        OH -->|Send Semantic Snippets + Caller Snippets + Lint Rules| OH_MODEL[(User-Downloaded OpenHands Model)]
-        OH_MODEL -->|Analyze Code & Catch Cross-Function Breaks| OH
-        OH --> OUT[Review Result: Summary + Mermaid + Breaking Alerts + Inline Fixes]
+        BUNDLE --> OH["OpenHands Model Client"]
+        OH -->|"Send Semantic Snippets + Caller Snippets + Lint Rules"| OH_MODEL[("User-Downloaded OpenHands Model")]
+        OH_MODEL -->|"Analyze Code & Catch Cross-Function Breaks"| OH
+        OH --> OUT["Review Result: Summary + Mermaid + Breaking Alerts + Inline Fixes"]
     end
 
     subgraph Publishing & Feedback
-        ORCH -->|Update PR Description with Mermaid & Impact Summary| GHS
-        ORCH -->|Post Comments: Suggestions + Claude/Codex/Agy Fix Buttons| GHS
-        ORCH -->|On synchronize: Auto-Resolve Fixed Threads via GraphQL| GHS
-        ORCH -->|Send Email Summary| SES[AWS SES via boto3]
+        ORCH -->|"Update PR Description with Mermaid & Impact Summary"| GHS
+        ORCH -->|"Post Comments: Suggestions + Claude/Codex/Agy Fix Buttons"| GHS
+        ORCH -->|"On synchronize: Auto-Resolve Fixed Threads via GraphQL"| GHS
+        ORCH -->|"Send Email Summary"| SES["AWS SES via boto3"]
     end
 ```
 

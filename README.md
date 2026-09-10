@@ -28,32 +28,32 @@ An open-source, containerized AI code review assistant. It hooks into your GitHu
 
 ```mermaid
 flowchart TD
-    GH["GitHub Webhook (PR opened, synchronize)"] -->|POST /webhook/github (HTTPS)| CADDY[Caddy Reverse Proxy / SSL]
-    CADDY --> API[FastAPI Webhook Handler in Docker]
-    API -->|HMAC SHA-256 Check| SEC[Signature Verification]
-    API -->|Background Task| ORCH[Reviewer Orchestrator]
+    GH["GitHub Webhook (PR opened, synchronize)"] -->|"POST /webhook/github (HTTPS)"| CADDY["Caddy Reverse Proxy / SSL"]
+    CADDY --> API["FastAPI Webhook Handler in Docker"]
+    API -->|"HMAC SHA-256 Check"| SEC["Signature Verification"]
+    API -->|"Background Task"| ORCH["Reviewer Orchestrator"]
     
     subgraph Context Gathering
-        ORCH -->|PyGithub| GHS[GitHub Service]
-        GHS -->|Diff & Changed Lines| GHR[(GitHub Repo)]
-        GHS -->|Lint Configs & Docs| GHR
-        ORCH --> CTX[Context & Snippet Builder]
-        CTX -->|AST Analysis| CTX
-        CTX -->|Extract Enclosing Functions & Callers| BUNDLE[Semantic Snippet Bundle]
+        ORCH -->|"PyGithub"| GHS["GitHub Service"]
+        GHS -->|"Diff & Changed Lines"| GHR[("GitHub Repo")]
+        GHS -->|"Lint Configs & Docs"| GHR
+        ORCH --> CTX["Context & Snippet Builder"]
+        CTX -->|"AST Analysis"| CTX
+        CTX -->|"Extract Enclosing Functions & Callers"| BUNDLE["Semantic Snippet Bundle"]
     end
 
     subgraph OpenHands Core
-        BUNDLE --> OH[OpenHands Model Client]
-        OH -->|Send Snippets + Rules| OH_MODEL[(Your OpenHands Model / Endpoint)]
-        OH_MODEL -->|Criticism + Mermaid + Fixes| OH
-        OH --> RES[Review Result]
+        BUNDLE --> OH["OpenHands Model Client"]
+        OH -->|"Send Snippets + Rules"| OH_MODEL[("Your OpenHands Model / Endpoint")]
+        OH_MODEL -->|"Criticism + Mermaid + Fixes"| OH
+        OH --> RES["Review Result"]
     end
 
     subgraph Publishing & Feedback
-        RES -->|Update PR Body with Mermaid| GHS
-        RES -->|Post Inline Suggestions + CLI Buttons| GHS
-        ORCH -->|On synchronize: Auto-Resolve via GraphQL| GHS
-        RES -->|Send Email Summary| SES[AWS SES via boto3]
+        RES -->|"Update PR Body with Mermaid"| GHS
+        RES -->|"Post Inline Suggestions + CLI Buttons"| GHS
+        ORCH -->|"On synchronize: Auto-Resolve via GraphQL"| GHS
+        RES -->|"Send Email Summary"| SES["AWS SES via boto3"]
     end
 ```
 

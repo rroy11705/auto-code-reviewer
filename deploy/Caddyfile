@@ -1,0 +1,18 @@
+# Caddy reverse proxy configuration for auto-code-reviewer
+# Replace {$DOMAIN} with your domain name (or server public IP) in .env or environment
+
+{$DOMAIN:localhost} {
+    # Forward all requests to the auto-code-reviewer container
+    reverse_proxy auto-code-reviewer:8000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Enable logging
+    log {
+        output stdout
+        format console
+    }
+}

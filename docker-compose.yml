@@ -1,0 +1,48 @@
+services:
+  auto-code-reviewer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auto-code-reviewer
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - reviewer-network
+
+  # Optional Caddy reverse proxy for automatic HTTPS when deployed to Vultr/VPS
+  caddy:
+    image: caddy:2.7-alpine
+    container_name: reviewer-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - auto-code-reviewer
+    profiles:
+      - with-proxy
+    networks:
+      - reviewer-network
+
+networks:
+  reviewer-network:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:

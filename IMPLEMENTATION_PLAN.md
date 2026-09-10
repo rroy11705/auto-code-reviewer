@@ -166,7 +166,7 @@ auto-code-reviewer/
   - Eliminates token bloat while guaranteeing full semantic context for the AI model.
 
 ### Component 2: OpenHands Model Client (`app/services/openhands_client.py`)
-- Connects to user-downloaded OpenHands model via REST API / OpenAI-compatible endpoint.
+- Connects to user-downloaded OpenHands model via REST API / OpenAI-compatible endpoint (defaulting to non-conflicting port `http://localhost:50000/api` or `http://localhost:11434/v1`).
 - Evaluates:
   1. **Feature Understanding & Architecture**: Generates Mermaid.js diagram illustrating component interactions.
   2. **Code Criticism**: Identifies bugs, performance issues, and lint violations.

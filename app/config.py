@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     GITHUB_WEBHOOK_SECRET: str = ""
 
     # OpenHands Model Settings (Developer-hosted OpenHands model)
-    OPENHANDS_ENDPOINT: str = "http://localhost:3000/api"
+    OPENHANDS_ENDPOINT: str = "http://localhost:50000/api"
     OPENHANDS_MODEL_NAME: str = "openhands-code-reviewer"
     OPENHANDS_API_KEY: Optional[str] = None
 

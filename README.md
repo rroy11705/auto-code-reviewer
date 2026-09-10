@@ -65,8 +65,8 @@ flowchart TD
 You can run OpenHands or any local code-capable model using Ollama, vLLM, or the OpenHands server container:
 
 ```bash
-# Example: Running an OpenAI-compatible OpenHands server on port 3000
-docker run -d --name openhands-model -p 3000:3000 ghcr.io/all-hands-ai/openhands:latest
+# Example: Running an OpenAI-compatible OpenHands server on port 50000 (avoids 3000 web dev conflict)
+docker run -d --name openhands-model -p 50000:3000 ghcr.io/all-hands-ai/openhands:latest
 ```
 
 ### 2. Configure Environment
@@ -81,7 +81,7 @@ Edit `.env` with your credentials:
 ```ini
 GITHUB_TOKEN=ghp_your_github_personal_access_token
 GITHUB_WEBHOOK_SECRET=your_webhook_secret_here
-OPENHANDS_ENDPOINT=http://localhost:3000/api
+OPENHANDS_ENDPOINT=http://localhost:50000/api
 ```
 
 ### 3. Run with Docker Compose
@@ -150,7 +150,7 @@ pytest -v
 | :--- | :--- | :--- |
 | `GITHUB_TOKEN` | *Required* | GitHub PAT or App token with `repo` scope |
 | `GITHUB_WEBHOOK_SECRET` | *Required* | Secret used to verify HMAC SHA-256 signatures |
-| `OPENHANDS_ENDPOINT` | `http://localhost:3000/api` | URL of your self-hosted OpenHands model endpoint |
+| `OPENHANDS_ENDPOINT` | `http://localhost:50000/api` | URL of your self-hosted OpenHands model endpoint |
 | `OPENHANDS_MODEL_NAME` | `openhands-code-reviewer` | Target model name |
 | `ANTHROPIC_API_KEY` | *Optional* | Fallback Claude API key if OpenHands endpoint is unreachable |
 | `ANTHROPIC_MODEL` | `claude-3-5-sonnet-20241022` | Claude model name |

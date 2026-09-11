@@ -5,13 +5,13 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg)](https://fastapi.tiangolo.com)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
-An open-source, containerized AI code review assistant. It hooks into your GitHub Pull Request workflow, connects to a self-hosted **OpenHands** model, analyzes full semantic function scopes and cross-file dependencies, updates the PR description with an architectural **Mermaid.js** diagram, and posts inline review comments with one-click fix buttons for **GitHub**, **Claude Code**, **Codex**, and **Antigravity CLI (`agy`)**.
+An open-source, containerized AI code review assistant. It hooks into your GitHub Pull Request workflow, connects to a self-hosted **OpenHands agent** or local LLM (like **DeepSeek-Coder** via Ollama), analyzes full semantic function scopes and cross-file dependencies, updates the PR description with an architectural **Mermaid.js** diagram, and posts inline review comments with one-click fix buttons for **GitHub**, **Claude Code**, **Codex**, and **Antigravity CLI (`agy`)**.
 
 ---
 
 ## 🌟 Key Features
 
-- **🧠 OpenHands Intelligence**: Connects directly to your locally downloaded or self-hosted OpenHands model to understand, criticize, and propose fixes.
+- **🧠 OpenHands Agent & Local LLM Power**: Connects directly to a self-hosted OpenHands agent runtime, a local LLM (e.g. `deepseek-coder:6.7b` via Ollama), or direct cloud APIs (Claude, GPT-4o) to understand, criticize, and propose verified code fixes.
 - **⚡ Token-Efficient Semantic Scope**: Unlike tools that blindly load entire 3,000-line files or inspect only isolated diff hunks, `auto-code-reviewer` uses AST analysis to extract the **complete enclosing functions, methods, and nested helpers**, cutting token cost by ~80% while retaining full semantic context.
 - **🔍 Cross-File Breaking Change Detection**: Identifies callers across dependent repository files and warns you if modified function signatures or return contracts break other modules.
 - **🛠️ Multi-Tool Fix Options on Every Issue**:
@@ -42,9 +42,9 @@ flowchart TD
         CTX -->|"Extract Enclosing Functions & Callers"| BUNDLE["Semantic Snippet Bundle"]
     end
 
-    subgraph OpenHands Core
-        BUNDLE --> OH["OpenHands Model Client"]
-        OH -->|"Send Snippets + Rules"| OH_MODEL[("Your OpenHands Model / Endpoint")]
+    subgraph Intelligence Engine
+        BUNDLE --> OH["Agent / Model Client"]
+        OH -->|"Send Snippets + Rules"| OH_MODEL[("OpenHands Agent or Ollama Model")]
         OH_MODEL -->|"Criticism + Mermaid + Fixes"| OH
         OH --> RES["Review Result"]
     end
@@ -61,13 +61,28 @@ flowchart TD
 
 ## 🚀 Quickstart
 
-### 1. Download & Run the OpenHands Model
-You can run OpenHands or any local code-capable model using Ollama, vLLM, or the OpenHands server container:
+### 1. Run Your Intelligence Engine (Pick One):
 
+#### Option A: Local LLM via Ollama (100% Free, e.g. DeepSeek-Coder)
 ```bash
-# Example: Running an OpenAI-compatible OpenHands server on port 50000 (avoids 3000 web dev conflict)
-docker run -d --name openhands-model -p 50000:3000 ghcr.io/all-hands-ai/openhands:latest
+# Run Ollama in Docker and pull DeepSeek-Coder
+docker run -d --name ollama -p 11434:11434 -v ollama_models:/root/.ollama ollama/ollama:latest
+docker exec ollama ollama pull deepseek-coder:6.7b
 ```
+*(Point `OPENHANDS_ENDPOINT=http://localhost:11434/v1` in `.env`)*
+
+#### Option B: Self-Hosted OpenHands Agent Container
+```bash
+# Run OpenHands agent platform on port 50000
+docker run -d --name openhands-app -p 50000:3000 -e LOG_ALL_EVENTS=true \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v ~/.openhands-state:/.openhands-state \
+  ghcr.io/all-hands-ai/openhands:latest
+```
+*(Point `OPENHANDS_ENDPOINT=http://localhost:50000/api` in `.env`)*
+
+#### Option C: Direct Cloud API (Claude 3.5 Sonnet / GPT-4o)
+Skip running local containers and directly configure `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` in `.env`.
 
 ### 2. Configure Environment
 ```bash
@@ -150,7 +165,7 @@ pytest -v
 | :--- | :--- | :--- |
 | `GITHUB_TOKEN` | *Required* | GitHub PAT or App token with `repo` scope |
 | `GITHUB_WEBHOOK_SECRET` | *Required* | Secret used to verify HMAC SHA-256 signatures |
-| `OPENHANDS_ENDPOINT` | `http://localhost:50000/api` | URL of your self-hosted OpenHands model endpoint |
+| `OPENHANDS_ENDPOINT` | `http://localhost:50000/api` | URL of OpenHands agent API or Ollama endpoint (e.g. `http://localhost:11434/v1`) |
 | `OPENHANDS_MODEL_NAME` | `openhands-code-reviewer` | Target model name |
 | `ANTHROPIC_API_KEY` | *Optional* | Fallback Claude API key if OpenHands endpoint is unreachable |
 | `ANTHROPIC_MODEL` | `claude-3-5-sonnet-20241022` | Claude model name |

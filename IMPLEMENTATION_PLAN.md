@@ -1,6 +1,6 @@
 # Implementation Plan: AI-Powered GitHub PR Reviewer ("auto-code-reviewer")
 
-An open-source, containerized, FastAPI-based automation service that intercepts GitHub Pull Request webhook events (`opened`, `synchronize`), connects to a user-downloaded **OpenHands model**, and performs **token-efficient, semantic cross-function impact analysis**.
+An open-source, containerized, FastAPI-based automation service that intercepts GitHub Pull Request webhook events (`opened`, `synchronize`), connects to an **OpenHands agent environment** or local LLM (such as **DeepSeek-Coder** via Ollama), and performs **token-efficient, semantic cross-function impact analysis**.
 
 Instead of costly full-file dumps or blind diff hunks, `auto-code-reviewer` intelligently extracts the **complete enclosing functions/methods (including nested helpers and decorators)** around modified lines, along with relevant **caller function snippets** across the repo. It understands function relationships, catches downstream breaking changes, generates PR descriptions with architectural Mermaid.js diagrams, and posts inline PR reviews featuring:
 1. **GitHub One-Click Suggestion blocks** (` ```suggestion `).

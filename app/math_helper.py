@@ -10,3 +10,4 @@ def compute_metrics(values: list) -> dict:
     # Warning: Calling divide with count=0 will raise ZeroDivisionError if values is empty
     avg = divide(total, count)
     return {"total": total, "average": avg}
+# Updated implementation

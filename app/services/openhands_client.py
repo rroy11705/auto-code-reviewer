@@ -147,10 +147,13 @@ class OpenHandsClient:
         self, system_prompt: str, user_prompt: str
     ) -> str:
         """Invokes the OpenHands server / local OpenAI-compatible inference endpoint."""
-        url = self.endpoint
-        # If pointing to base or /api, determine chat completions URL
+        url = self.endpoint.rstrip("/")
+        # If pointing to base or /api or /v1, determine chat completions URL
         if not url.endswith("/chat/completions"):
-            url = f"{url.rstrip('/')}/v1/chat/completions"
+            if url.endswith("/v1"):
+                url = f"{url}/chat/completions"
+            else:
+                url = f"{url}/v1/chat/completions"
 
         headers = {"Content-Type": "application/json"}
         if self.api_key:
